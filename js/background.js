@@ -7,19 +7,19 @@ class Background {
     this.imageInstance = new Image()
     this.imageInstance.src = imgSource
     this.imagePosition = { x:0, y:0 }
-    this.speed = 10
   }
 
   draw() {
     this.ctx.drawImage(this.imageInstance, this.imagePosition.x, this.imagePosition.y, this.imageWidth, this.imageHeight)
     this.ctx.drawImage(this.imageInstance, this.imagePosition.x + this.imageWidth, this.imagePosition.y, this.imageWidth, this.imageHeight)
+    this.move(5)
   }
 
-  move() {
+  move(speed) {
     if (this.imagePosition.x <= -this.imageWidth) {
       this.imagePosition.x = 0;
     }
-    this.imagePosition.x -= this.speed
+    this.imagePosition.x -= speed
   }
 }
 
@@ -28,9 +28,9 @@ class Home {
         this.ctx = ctx
         this.gameWidth = gameWidth
         this.gameHeight = gameHeight
-        this.init()
         this.homeSize = { w:525, h:400 }
-        this.homePos = { x:1000, y:this.gameHeight-this.homeSize.h-100}
+        this.homePos = { x:2000, y:this.gameHeight-this.homeSize.h-100}
+        this.init()
     }
 
     init() {
@@ -40,10 +40,11 @@ class Home {
 
     draw() {
         this.ctx.drawImage(this.imageInstance, this.homePos.x, this.homePos.y, this.homeSize.w, this.homeSize.h)
+        this.move(5)
     }
 
-    move() {
-        this.homePos.x -= 10
+    move(speed) {
+        this.homePos.x -= speed
     }
 
 }

@@ -42,9 +42,8 @@ const Game = {
 
     setEventListeners() {
         document.onkeydown = e => {
-            if (e.key === this.keys.MOVEFORWARD ) {
-                this.background.move()
-                this.home.move()
+            if (e.key === this.keys.JUMP) {
+                this.player.jump(this.framesCounter)
             }
         }
   },
@@ -71,6 +70,7 @@ const Game = {
     reset() {
         this.background = new Background(this.ctx, this.canvasSize.w, this.canvasSize.h, "./img/game-background.jpg")
         this.home = new Home(this.ctx, this.canvasSize.w, this.canvasSize.h)
+        this.player = new Player(this.ctx, this.canvasSize.w, this.canvasSize.h)
     },
 
     clearAll() {
@@ -80,6 +80,7 @@ const Game = {
     drawAll() {
         this.background.draw()
         this.home.draw()
+        this.player.draw(this.framesCounter)
     },
 
     generatePlatforms() {},
