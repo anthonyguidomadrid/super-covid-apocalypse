@@ -22,3 +22,28 @@ class Background {
     this.imagePosition.x -= this.speed
   }
 }
+
+class Home {
+    constructor(ctx, gameWidth, gameHeight) {
+        this.ctx = ctx
+        this.gameWidth = gameWidth
+        this.gameHeight = gameHeight
+        this.init()
+        this.homeSize = { w:525, h:400 }
+        this.homePos = { x:1000, y:this.gameHeight-this.homeSize.h-100}
+    }
+
+    init() {
+        this.imageInstance = new Image()
+        this.imageInstance.src = './img/ending-point.png'
+    }
+
+    draw() {
+        this.ctx.drawImage(this.imageInstance, this.homePos.x, this.homePos.y, this.homeSize.w, this.homeSize.h)
+    }
+
+    move() {
+        this.homePos.x -= 10
+    }
+
+}
