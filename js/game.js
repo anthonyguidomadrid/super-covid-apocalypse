@@ -24,6 +24,7 @@ const Game = {
     sickPeople: [],
     vaccine: undefined,
     totalPoint: 100,
+    speed: 5,
 
     init() {
         this.canvasDom = document.querySelector('#canvas')
@@ -41,9 +42,10 @@ const Game = {
     },
 
     setEventListeners() {
-        document.onkeydown = e => {
+        document.onkeyup = e => {
             if (e.key === this.keys.JUMP) {
                 this.player.jump(this.framesCounter)
+                console.log(this.player.imageInstance)
             }
         }
   },
@@ -68,8 +70,8 @@ const Game = {
     },
 
     reset() {
-        this.background = new Background(this.ctx, this.canvasSize.w, this.canvasSize.h, "./img/game-background.jpg")
-        this.home = new Home(this.ctx, this.canvasSize.w, this.canvasSize.h)
+        this.background = new Background(this.ctx, this.canvasSize.w, this.canvasSize.h, "./img/game-background.jpg", this.speed)
+        this.home = new Home(this.ctx, this.canvasSize.w, this.canvasSize.h, this.speed)
         this.player = new Player(this.ctx, this.canvasSize.w, this.canvasSize.h)
     },
 
