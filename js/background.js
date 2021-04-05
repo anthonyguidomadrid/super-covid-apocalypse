@@ -45,7 +45,7 @@ class Home {
         this.move()
     }
 
-    move(speed) {
+    move() {
         this.homePos.x -= this.speed
     }
 

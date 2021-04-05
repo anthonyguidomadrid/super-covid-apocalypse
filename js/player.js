@@ -4,17 +4,21 @@ class Player {
     this.ctx = ctx
     this.gameWidth = gameWidth
     this.gameHeight = gameHeight
+
     this.playerWidth = 125
     this.playerHeight = 250
+
     this.imageInstance = new Image()
     this.imageInstance.src = "./img/player-walking.png"
     this.imageInstance.frames = 8
     this.imageInstance.framesIndex = 0
+
     this.playerPositionX = 50
     this.playerPositionY = this.gameHeight-this.playerHeight-20
     this.floorLevel = this.playerPositionY
+
     this.speed = 1
-    this.gravity = 0.3
+    this.gravity = 0.4
   }
 
   draw(framesCounter) {
@@ -35,19 +39,7 @@ class Player {
     this.move()
   }
 
-  move() {
-    if (this.playerPositionY < this.floorLevel) {   
-      this.playerPositionY += this.speed
-      this.speed += this.gravity
-      this.imageInstance.src = "./img/player-jumping.png"
-    } else {
-      this.playerPositionY = this.floorLevel
-      this.speed = 1
-      this.imageInstance.src = "./img/player-walking.png"
-    }
-  }
-
-  animate(framesCounter) {
+    animate(framesCounter) {
     if (framesCounter % 5 == 0) {
       this.imageInstance.framesIndex++
     }
@@ -56,15 +48,35 @@ class Player {
     }
   }
 
-  jump() {
-      if (this.playerPositionY >= this.floorLevel) {
-            this.playerPositionY -= 350 
-            this.playerPositionY -= this.gravity
-          }
+  move() {
+    if (this.playerPositionY < this.floorLevel) {  
+      this.playerPositionY += this.speed
+      this.speed += this.gravity
+    } else {
+      this.playerPositionY = this.floorLevel
+      this.speed = 1
+    }
+  }
 
-      // if (this.playerPositionY = 650) {
-      //   this.imageInstance.src = "./img/player-walking.png"
-      // }
+  jump() {
+   setTimeout(() => {
+     this.imageInstance.src = "./img/player-walking.png"
+     this.playerHeight = 250
+   }, 1000);
+      this.imageInstance.src = "./img/player-jumping.png"
+      this.playerHeight = 280
+      if (this.playerPositionY === this.floorLevel) {
+      this.playerPositionY -= 300
+      this.speed -= 8
+      } 
+  }
+
+  vaccinate() {
+
+   setTimeout(() => {
+     this.imageInstance.src = "./img/player-walking.png"
+   }, 1000);
+      this.imageInstance.src = "./img/player-vaccinating.png"
   }
 
 }
