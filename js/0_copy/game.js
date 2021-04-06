@@ -18,10 +18,8 @@ const Game = {
     background: undefined,
     home: undefined,
     player: undefined,
-    platform: undefined,
     platforms: [],
-    masks: [],
-    gels: [],
+    points: [],
     sickPeople: [],
     vaccine: undefined,
     totalPoint: 100,
@@ -55,11 +53,11 @@ const Game = {
                 this.vaccine.vaccineLength = 100
             }
         }
-    },
+  },
 
     start() {
         this.reset()
-        this.interval = setInterval(() => {
+        this.interval = setInterval(() =>{
             this.framesCounter > 5000 ? this.framesCounter = 0 : this.framesCounter++
             this.clearAll()
             this.drawAll()
@@ -67,10 +65,10 @@ const Game = {
             this.generatePoints()
             this.generateSickPeople()
             this.clearElements()
-            this.jumpPlatform()
-            this.getPoints()
+            this.jumpPlatform() 
+            this.getPoints () 
             this.isContaminated()
-            this.isVaccinated()
+            this.isVaccinated() 
             this.allPointsLost() ? this.gameOver() : null
             this.backHome() ? this.gameWon() : null
         }, 1000 / this.FPS)
@@ -80,7 +78,7 @@ const Game = {
         this.background = new Background(this.ctx, this.canvasSize.w, this.canvasSize.h, "./img/game-background.jpg", this.speed)
         this.home = new Home(this.ctx, this.canvasSize.w, this.canvasSize.h, this.speed)
         this.player = new Player(this.ctx, this.canvasSize.w, this.canvasSize.h)
-        this.vaccine = new Vaccine(this.ctx, this.canvasSize.h, 0)
+        this.vaccine = new Vaccine(this.ctx, this.canvasSize.h, 0)  
     },
 
     clearAll() {
@@ -95,41 +93,24 @@ const Game = {
         this.sickPeople.forEach(elm => {
             elm.draw()
         })
-        this.masks.forEach(elm => {
-            elm.draw()
-        })
-        this.gels.forEach(elm => {
-            elm.draw()
-        })
     },
 
-    generatePlatforms() {
-    },
+    generatePlatforms() {},
 
-    generatePoints() {
-        const gelRandom = Math.floor(Math.random() * 50) + 150
-        const maskRandom = Math.floor(Math.random() * 100) + 100
-        if (this.framesCounter % gelRandom === 0) {
-            this.gels.push(new Points(this.ctx, this.canvasSize.h, this.canvasSize.w, "./img/gel.png", this.speed, this.canvasSize.h - 70))
-        } else if (this.framesCounter % maskRandom === 0) {
-            this.masks.push(new Points(this.ctx, this.canvasSize.h, this.canvasSize.w, "./img/mask.png", this.speed, this.canvasSize.h - 400))
-        }
-    },
+    generatePoints() {},
 
     generateSickPeople() {
         const womanRandom = Math.floor(Math.random() * 150) + 50
         const manRandom = Math.floor(Math.random() * 50) + 150
         if (this.framesCounter % womanRandom === 0) {
-            this.sickPeople.push(new Sickpeople(this.ctx, this.canvasSize.h, this.canvasSize.w, "./img/sick-woman.png", this.speed))
-        } else if (this.framesCounter % manRandom === 0) {
-            this.sickPeople.push(new Sickpeople(this.ctx, this.canvasSize.h, this.canvasSize.w, "./img/sick-man.png", this.speed))
-        }
+      this.sickPeople.push(new Sickpeople(this.ctx, this.canvasSize.h,this.canvasSize.w, "./img/sick-woman.png", this.speed))
+    } else if (this.framesCounter % manRandom === 0) {
+      this.sickPeople.push(new Sickpeople(this.ctx, this.canvasSize.h,this.canvasSize.w, "./img/sick-man.png", this.speed))
+    }
     },
 
     clearElements() {
         this.sickPeople = this.sickPeople.filter(sickPerson => sickPerson.sickPersonPosition.x >= 0)
-        this.masks = this.masks.filter(point => point.pointsPosition.x >= 0)
-        this.gels = this.gels.filter(point => point.pointsPosition.x >= 0)
     },
 
     jumpPlatform() {
@@ -138,63 +119,46 @@ const Game = {
         // si el player no esta encima de la plataforma => vuelve al suelo
     },
 
-    getPlatform() { },
+    getPlatform() {},
 
-    getRewards() { },
+    getRewards() {},
 
-    getPoints() {
-        this.masks.forEach(elm => {
-            if (this.player.playerPositionX < elm.pointsPosition.x + elm.pointsSize.w &&
-                this.player.playerPositionX + this.player.playerWidth > elm.pointsPosition.x &&
-                this.player.playerPositionY < elm.pointsPosition.y + elm.pointsSize.h &&
-                this.player.playerPositionY + this.player.playerHeight > elm.pointsPosition.y) {
-                this.masks.splice(elm, 1);
-                this.totalPoint += 5
-                console.log(this.totalPoint)
-            }
-        })
-        this.gels.forEach(elm => {
-            if (this.player.playerPositionX < elm.pointsPosition.x + elm.pointsSize.w &&
-                this.player.playerPositionX + this.player.playerWidth > elm.pointsPosition.x &&
-                this.player.playerPositionY < elm.pointsPosition.y + elm.pointsSize.h &&
-                this.player.playerPositionY + this.player.playerHeight > elm.pointsPosition.y) {
-                this.gels.splice(elm, 1);
-                this.totalPoint += 10
-                console.log(this.totalPoint)
-            }
-        })
+    getPoints () {
+        
     },
 
     isContaminated() {
-        this.sickPeople.forEach(element => {
-            if (element.sickPersonPosition.x < this.player.playerPositionX + this.player.playerWidth && this.player.playerPositionY === this.canvasSize.h - this.player.playerHeight - 20) {
+        this.sickPeople.forEach( element => {
+            if(element.sickPersonPosition.x < this.player.playerPositionX + this.player.playerWidth && this.player.playerPositionY === this.floorLevel) {
+                console.log("contaminated")
                 this.totalPoint -= 50
                 console.log(this.totalPoint)
+                console.log(this.player)
             }
         });
     },
 
-    looseLife() { },
+    looseLife() {},
 
     isVaccinated() {
-
-        this.sickPeople.forEach(element => {
-            if (element.sickPersonPosition.x < this.vaccine.vaccineX + this.vaccine.vaccineLength && this.player.playerPositionY === this.canvasSize.h - this.player.playerHeight - 20) {
-                this.sickPeople.splice(element, 1);
+            
+        this.sickPeople.forEach( element => {
+            if(element.sickPersonPosition.x < this.vaccine.vaccineX + this.vaccine.vaccineLength && this.player.playerPositionY === this.canvasSize.h-this.player.playerHeight-20) {
+                this.sickPeople.splice(element, 1); 
             }
         });
-
+        
     },
 
-    healing() { },
+    healing() {},
 
-    allPointsLost() { },
+    allPointsLost() {},
 
     gameOver() {
         clearInterval(this.interval)
     },
 
-    backHome() { },
-
-    gameWon() { }
+    backHome() {},
+    
+    gameWon() {}
 }
