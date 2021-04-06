@@ -66,7 +66,7 @@ class Player {
       this.imageInstance.src = "./img/player-jumping.png"
       this.playerHeight = 280
       if (this.playerPositionY === this.floorLevel) {
-      this.playerPositionY -= 300
+      this.playerPositionY -= 370
       this.speed -= 8
       } 
   }

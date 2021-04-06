@@ -18,6 +18,7 @@ const Game = {
     background: undefined,
     home: undefined,
     player: undefined,
+    platform: undefined,
     platforms: [],
     masks: [],
     gels: [],
@@ -66,12 +67,12 @@ const Game = {
             this.generatePoints()
             this.generateSickPeople()
             this.clearElements()
-            this.isOnPlatform()
+            this.jumpPlatform()
             this.getPoints()
             this.isContaminated()
             this.isVaccinated()
-            this.gameOver() 
-            this.gameWon() 
+            this.allPointsLost() ? this.gameOver() : null
+            this.backHome() ? this.gameWon() : null
         }, 1000 / this.FPS)
     },
 
@@ -100,17 +101,9 @@ const Game = {
         this.gels.forEach(elm => {
             elm.draw()
         })
-        this.platforms.forEach(elm => {
-            elm.draw()
-        })
     },
 
     generatePlatforms() {
-        const frequencyRandom = Math.floor(Math.random() * 100) + 100
-        const widthPlatformRandom = Math.floor(Math.random() * 450) + 350
-        if (this.framesCounter % frequencyRandom === 0) {
-            this.platforms.push(new Platforms(this.ctx, this.canvasSize.h, this.canvasSize.w, widthPlatformRandom, this.speed))
-        }
     },
 
     generatePoints() {
@@ -119,7 +112,7 @@ const Game = {
         if (this.framesCounter % gelRandom === 0) {
             this.gels.push(new Points(this.ctx, this.canvasSize.h, this.canvasSize.w, "./img/gel.png", this.speed, this.canvasSize.h - 70))
         } else if (this.framesCounter % maskRandom === 0) {
-            this.masks.push(new Points(this.ctx, this.canvasSize.h, this.canvasSize.w, "./img/mask.png", this.speed, this.canvasSize.h - 385))
+            this.masks.push(new Points(this.ctx, this.canvasSize.h, this.canvasSize.w, "./img/mask.png", this.speed, this.canvasSize.h - 400))
         }
     },
 
@@ -139,33 +132,21 @@ const Game = {
         this.gels = this.gels.filter(point => point.pointsPosition.x >= 0)
     },
 
-    isOnPlatform() {
-        this.platforms.forEach(elm => {
-            if (elm.platPos.y - 20 < this.player.playerPositionY + this.player.playerHeight
-                && this.player.playerPositionY < elm.platPos.y 
-                && elm.platPos.x < this.player.playerPositionX
-                && elm.platPos.x + elm.platSize.w > this.player.playerPositionX
-            ) {
-                this.player.floorLevel = elm.platPos.y - this.player.playerHeight -20
-                this.player.playerPositionY = this.player.floorLevel
-                this.player.imageInstance.src = "./img/player-walking.png"
-                this.player.playerHeight = 250
-            } else {
-                this.player.floorLevel = this.canvasSize.h - this.player.playerHeight -20
-            }
+    jumpPlatform() {
+        if ( this.player.playerPositionX < elm.platPos.x -20 + elm.platSize.w 
+            && this.player.playerPositionX + this.player.playerWidth > elm.platPos.x -20
+            && this.player.playerPositionY < elm.platPos.y + 20 
+            && 20 + this.player.playerPositionY > elm.platPos.y) {
 
-        })
+        }
+        // si el player entra en contacto con la parte superior de la plataforma => el x del player va a ser del x de la plataforma + 20
+        // else if el player entra en contacto con la parte lateral izquierda o la parte de abajo de la plataforma => el x del player vuelve a ser el x del suelo
+        // si el player no esta encima de la plataforma => vuelve al suelo
     },
 
-    // cantGetPlatform() { 
-        // this.platforms.forEach(elm => {
-        //     if (this.player.playerPositionY < elm.platPos.y + elm.platSize.h
-        //         && elm.platPos.x < this.player.playerPositionX 
-        //         && elm.platPos.x + elm.platSize.w > this.player.playerPositionX) {
-        //             console.log("no puedes subir")
-        //     }
-        // })
-    // },
+    getPlatform() { },
+
+    getRewards() { },
 
     getPoints() {
         this.masks.forEach(elm => {
@@ -175,6 +156,7 @@ const Game = {
                 this.player.playerPositionY + this.player.playerHeight > elm.pointsPosition.y) {
                 this.masks.splice(elm, 1);
                 this.totalPoint += 5
+                console.log(this.totalPoint)
             }
         })
         this.gels.forEach(elm => {
@@ -184,6 +166,7 @@ const Game = {
                 this.player.playerPositionY + this.player.playerHeight > elm.pointsPosition.y) {
                 this.gels.splice(elm, 1);
                 this.totalPoint += 10
+                console.log(this.totalPoint)
             }
         })
     },
@@ -192,9 +175,12 @@ const Game = {
         this.sickPeople.forEach(element => {
             if (element.sickPersonPosition.x < this.player.playerPositionX + this.player.playerWidth && this.player.playerPositionY === this.canvasSize.h - this.player.playerHeight - 20) {
                 this.totalPoint -= 50
+                console.log(this.totalPoint)
             }
         });
     },
+
+    looseLife() { },
 
     isVaccinated() {
 
@@ -206,9 +192,15 @@ const Game = {
 
     },
 
+    healing() { },
+
+    allPointsLost() { },
+
     gameOver() {
         clearInterval(this.interval)
     },
+
+    backHome() { },
 
     gameWon() { }
 }
