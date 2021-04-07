@@ -16,6 +16,8 @@ const Game = {
     FPS: 60,
     framesCounter: 0,
     background: undefined,
+    screen: undefined,
+    button: undefined,
     home: undefined,
     player: undefined,
     platforms: [],
@@ -23,15 +25,18 @@ const Game = {
     gels: [],
     sickPeople: [],
     vaccine: undefined,
-    totalPoint: 100,
-    speed: 5,
+    pointsCounter: undefined,
+    totalPoint: 0,
+    speed: 0,
+    audio: undefined,
 
     init() {
+
         this.canvasDom = document.querySelector('#canvas')
         this.ctx = this.canvasDom.getContext('2d')
         this.setDimensions()
         this.setEventListeners()
-        this.start()
+        this.reset()
     },
 
     setDimensions() {
@@ -56,31 +61,58 @@ const Game = {
         }
     },
 
-    start() {
-        this.reset()
-        this.interval = setInterval(() => {
-            this.framesCounter > 5000 ? this.framesCounter = 0 : this.framesCounter++
-            this.clearAll()
-            this.drawAll()
-            this.generatePlatforms()
-            this.generatePoints()
-            this.generateSickPeople()
-            this.clearElements()
-            this.isOnPlatform()
-            this.cantGetPlatform()
-            this.getPoints()
-            this.isContaminated()
-            this.isVaccinated()
-            this.gameOver() 
-            this.gameWon() 
-        }, 1000 / this.FPS)
+    startScreen() {
+        this.button = document.querySelector('#start-button')
+        this.button.addEventListener('click', function () {
+            document.getElementById("start-screen").style.display = "none"
+            Game.init()
+        });
     },
 
     reset() {
+        clearInterval(this.interval)
+        this.audio = undefined
+        this.totalPoint = 100
+        this.speed = 5
         this.background = new Background(this.ctx, this.canvasSize.w, this.canvasSize.h, "./img/game-background.jpg", this.speed)
         this.home = new Home(this.ctx, this.canvasSize.w, this.canvasSize.h, this.speed)
         this.player = new Player(this.ctx, this.canvasSize.w, this.canvasSize.h)
         this.vaccine = new Vaccine(this.ctx, this.canvasSize.h, 0)
+        this.start()
+    },
+
+    start() {
+        this.music()
+        this.interval = setInterval(() => {
+            this.framesCounter > 5000 ? this.framesCounter = 0 : this.framesCounter++
+            this.clearAll()
+            this.drawAll()
+            this.pointsCounting()
+            this.generatePlatforms()
+            this.generatePoints()
+            this.generateSickPeople()
+            this.clearElements()
+            this.cantGetPlatform()
+            this.isOnPlatform()
+            this.getPoints()
+            this.isContaminated()
+            this.isVaccinated()
+            this.gameOver()
+            this.gameWon()
+        }, 1000 / this.FPS)
+    },
+
+    music() {
+        this.audio = document.createElement("audio")
+        this.audio.src = "./audio/music.mp3"
+        this.audio.loop = true
+        this.audio.pause()
+        this.audio.play()
+    },
+
+    pointsCounting() {
+        this.pointsCounter = document.querySelector('.health span')
+        this.pointsCounter.innerText = this.totalPoint
     },
 
     clearAll() {
@@ -106,7 +138,7 @@ const Game = {
         })
     },
 
-    generatePlatforms() {       
+    generatePlatforms() {
         const frequencyRandom = Math.floor(Math.random() * 100) + 100
         const widthPlatformRandom = Math.floor(Math.random() * 450) + 350
         if (this.framesCounter % frequencyRandom === 0) {
@@ -141,32 +173,35 @@ const Game = {
         this.platforms = this.platforms.filter(platform => platform.platPos.x >= -1000)
     },
 
+    cantGetPlatform() {
+        // this.platforms.forEach(elm => {
+        //     if (this.player.playerPositionY < elm.platPos.y + elm.platSize.h
+        //         && elm.platPos.x < this.player.playerPositionX 
+        //         && elm.platPos.x + elm.platSize.w > this.player.playerPositionX
+        //         && this.player.playerPositionY + this.player.playerHeight > elm.platPos.y + elm.platSize.h
+        //         ) {
+        //             // this.player.playerPositionY = this.player.floorLevel 
+        //             console.log("no puede subir")
+        //     }
+        // })
+    },
+
     isOnPlatform() {
         this.platforms.forEach(elm => {
             if (elm.platPos.y - 20 < this.player.playerPositionY + this.player.playerHeight
-                && this.player.playerPositionY < elm.platPos.y 
+                && this.player.playerPositionY + 200 < elm.platPos.y
                 && elm.platPos.x < this.player.playerPositionX
                 && elm.platPos.x + elm.platSize.w > this.player.playerPositionX
             ) {
-                this.player.floorLevel = elm.platPos.y - this.player.playerHeight -20
+                this.player.floorLevel = elm.platPos.y - this.player.playerHeight - 20
                 this.player.playerPositionY = this.player.floorLevel
                 this.player.imageInstance.src = "./img/player-walking.png"
                 this.player.playerHeight = 250
             } else {
-                this.player.floorLevel = this.canvasSize.h - this.player.playerHeight -20
+                this.player.floorLevel = this.canvasSize.h - this.player.playerHeight - 20
             }
 
         })
-    },
-
-    cantGetPlatform() { 
-    // this.platforms.forEach(elm => {
-    //     if (this.player.playerPositionY < elm.platPos.y + elm.platSize.h
-    //         && elm.platPos.x < this.player.playerPositionX 
-    //         && elm.platPos.x + elm.platSize.w > this.player.playerPositionX) {
-    //             this.player.playerPositionY = this.player.floorLevel 
-    //     }
-    // })
     },
 
     getPoints() {
@@ -195,7 +230,7 @@ const Game = {
     isContaminated() {
         this.sickPeople.forEach(element => {
             if (element.sickPersonPosition.x < this.player.playerPositionX + this.player.playerWidth && this.player.playerPositionY === this.canvasSize.h - this.player.playerHeight - 20) {
-                this.totalPoint -= 50
+                this.totalPoint -= 25
                 console.log(this.totalPoint)
             }
         });
@@ -212,8 +247,34 @@ const Game = {
     },
 
     gameOver() {
-        // clearInterval(this.interval)
+        if (this.totalPoint <= 0) {
+            this.audio.pause()
+            clearInterval(this.interval)
+            document.getElementById("gameover-screen").style.display = "block"
+
+            this.button = document.querySelector('#tryagain-button')
+            console.log(this.button)
+
+            this.button.addEventListener('click', () => {
+                document.getElementById("gameover-screen").style.display = "none"
+                this.reset()
+            });
+        }
+
     },
 
-    gameWon() { }
+    gameWon() {
+        if (this.player.playerPositionX + this.player.playerWidth > this.home.homePos.x + this.home.homeSize.w / 2) {
+            this.audio.pause()
+            clearInterval(this.interval)
+            document.getElementById("gamewon-screen").style.display = "block"
+
+            this.button = document.querySelector('#playagain-button')
+
+            this.button.addEventListener('click', () => {
+                document.getElementById("gamewon-screen").style.display = "none"
+                this.reset()
+            });
+        }
+    }
 }

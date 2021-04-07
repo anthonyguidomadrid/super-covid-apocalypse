@@ -1,1 +1,1 @@
-window.onload = () => Game.init()
+window.onload = () => Game.startScreen()
