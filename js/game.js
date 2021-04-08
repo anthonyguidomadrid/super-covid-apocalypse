@@ -72,7 +72,7 @@ const Game = {
                     this.player.imageInstance.src = "./img/player-walking.png"
                     this.vaccine.vaccineX = 175
                     this.vaccine.vaccineLength = 0
-                    }, 1000);
+                    }, 250);
                     this.player.imageInstance.src = "./img/player-vaccinating.png"
                     this.vaccine.vaccineLength = 20
                 }

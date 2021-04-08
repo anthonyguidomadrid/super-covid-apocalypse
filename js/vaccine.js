@@ -22,6 +22,6 @@ class Vaccine {
     move() {
         if (this.vaccineLength > 0) {
         this.vaccineX += 20
-        }
+        } 
     }
 }
