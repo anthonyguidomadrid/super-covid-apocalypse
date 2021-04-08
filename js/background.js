@@ -1,5 +1,5 @@
 class Background {
-
+  
   constructor(ctx, imageWidth, imageHeight, imgSource, speed) {
     this.ctx = ctx
     this.imageWidth = imageWidth
@@ -30,7 +30,7 @@ class Home {
         this.gameWidth = gameWidth
         this.gameHeight = gameHeight
         this.homeSize = { w:525, h:400 }
-        this.homePos = { x:2000, y:this.gameHeight-this.homeSize.h-100}
+        this.homePos = { x:20000, y:this.gameHeight-this.homeSize.h-100}
         this.speed = speed
         this.init()
     }
@@ -48,5 +48,4 @@ class Home {
     move() {
         this.homePos.x -= this.speed
     }
-
 }

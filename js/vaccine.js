@@ -1,9 +1,11 @@
 class Vaccine {
-    constructor(ctx, gameHeight, vaccineLength) {
+    
+    constructor(ctx, gameHeight) {
         this.ctx = ctx
         this.gameHeight = gameHeight
-        this.vaccineLength = vaccineLength
+        this.vaccineLength = 0
         this.vaccineX = 175
+        this.speed = 0
     }
     draw(playerHeight, playerY) {
         this.ctx.beginPath()
@@ -14,5 +16,12 @@ class Vaccine {
         this.ctx.lineTo(this.vaccineX + this.vaccineLength, playerY + playerHeight / 2 - 26)
         this.ctx.stroke()
         this.ctx.closePath()
+        this.move()
+    }
+
+    move() {
+        if (this.vaccineLength > 0) {
+        this.vaccineX += 20
+        }
     }
 }

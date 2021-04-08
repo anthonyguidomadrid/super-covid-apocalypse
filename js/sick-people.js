@@ -1,4 +1,5 @@
 class Sickpeople {
+    
     constructor(ctx, gameHeight, gameWidth, imageSource, speed) {
         this.ctx = ctx
         this.gameHeight = gameHeight

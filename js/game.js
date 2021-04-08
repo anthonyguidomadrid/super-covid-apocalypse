@@ -15,9 +15,11 @@ const Game = {
     },
     FPS: 60,
     framesCounter: 0,
+    level: 1,
     background: undefined,
-    screen: undefined,
-    button: undefined,
+    startButton: undefined,
+    tryAgainButton: undefined,
+    playAgainButton: undefined,
     home: undefined,
     player: undefined,
     platforms: [],
@@ -26,12 +28,12 @@ const Game = {
     sickPeople: [],
     vaccine: undefined,
     pointsCounter: undefined,
-    totalPoint: 0,
-    speed: 0,
+    totalPoint: 100,
+    speed: 5,
+    levelbtn: undefined,
     audio: undefined,
 
     init() {
-
         this.canvasDom = document.querySelector('#canvas')
         this.ctx = this.canvasDom.getContext('2d')
         this.setDimensions()
@@ -49,21 +51,38 @@ const Game = {
     setEventListeners() {
         document.onkeyup = e => {
             if (e.key === this.keys.JUMP) {
-                this.player.jump(this.framesCounter)
+                if(this.platforms.length === 0) {
+                    this.player.jump()
+                    return
+                }
+
+                this.platforms.forEach(elm => {
+                    
+                    if (!(this.player.playerPositionY > elm.platPos.y + elm.platSize.h
+                    && this.player.playerPositionX > elm.platPos.x
+                    && this.player.playerPositionX < elm.platPos.x + elm.platSize.w)) {
+                        
+                        this.player.jump()
+                    }
+                })
             }
             if (e.key === this.keys.VACCINE) {
-                this.player.vaccinate()
-                setTimeout(() => {
+                if(this.player.playerPositionY === this.canvasSize.h - this.player.playerHeight - 20) {
+                    setTimeout(() => {
+                    this.player.imageInstance.src = "./img/player-walking.png"
+                    this.vaccine.vaccineX = 175
                     this.vaccine.vaccineLength = 0
-                }, 1000);
-                this.vaccine.vaccineLength = 100
-            }
+                    }, 1000);
+                    this.player.imageInstance.src = "./img/player-vaccinating.png"
+                    this.vaccine.vaccineLength = 20
+                }
+            } 
         }
     },
 
     startScreen() {
-        this.button = document.querySelector('#start-button')
-        this.button.addEventListener('click', function () {
+        this.startButton = document.querySelector('#start-button')
+        this.startButton.addEventListener('click', function () {
             document.getElementById("start-screen").style.display = "none"
             Game.init()
         });
@@ -71,18 +90,16 @@ const Game = {
 
     reset() {
         clearInterval(this.interval)
-        this.audio = undefined
-        this.totalPoint = 100
-        this.speed = 5
         this.background = new Background(this.ctx, this.canvasSize.w, this.canvasSize.h, "./img/game-background.jpg", this.speed)
         this.home = new Home(this.ctx, this.canvasSize.w, this.canvasSize.h, this.speed)
         this.player = new Player(this.ctx, this.canvasSize.w, this.canvasSize.h)
-        this.vaccine = new Vaccine(this.ctx, this.canvasSize.h, 0)
+        this.vaccine = new Vaccine(this.ctx, this.canvasSize.h)
+        this.definemusic()
+        this.audio.play()
         this.start()
     },
 
     start() {
-        this.music()
         this.interval = setInterval(() => {
             this.framesCounter > 5000 ? this.framesCounter = 0 : this.framesCounter++
             this.clearAll()
@@ -92,8 +109,8 @@ const Game = {
             this.generatePoints()
             this.generateSickPeople()
             this.clearElements()
-            this.cantGetPlatform()
             this.isOnPlatform()
+            this.almostDead()
             this.getPoints()
             this.isContaminated()
             this.isVaccinated()
@@ -102,12 +119,8 @@ const Game = {
         }, 1000 / this.FPS)
     },
 
-    music() {
-        this.audio = document.createElement("audio")
-        this.audio.src = "./audio/music.mp3"
-        this.audio.loop = true
-        this.audio.pause()
-        this.audio.play()
+    definemusic() {
+        this.audio = document.querySelector("audio")
     },
 
     pointsCounting() {
@@ -124,30 +137,21 @@ const Game = {
         this.home.draw()
         this.player.draw(this.framesCounter)
         this.vaccine.draw(this.player.playerHeight, this.player.playerPositionY)
-        this.sickPeople.forEach(elm => {
-            elm.draw()
-        })
-        this.masks.forEach(elm => {
-            elm.draw()
-        })
-        this.gels.forEach(elm => {
-            elm.draw()
-        })
-        this.platforms.forEach(elm => {
-            elm.draw()
-        })
+        this.sickPeople.forEach(elm => { elm.draw() })
+        this.masks.forEach(elm => { elm.draw() })
+        this.gels.forEach(elm => { elm.draw() })
+        this.platforms.forEach(elm => { elm.draw() })
     },
 
     generatePlatforms() {
-        const frequencyRandom = Math.floor(Math.random() * 100) + 100
-        const widthPlatformRandom = Math.floor(Math.random() * 450) + 350
-        if (this.framesCounter % frequencyRandom === 0) {
+        const widthPlatformRandom = Math.floor(Math.random() * 200) + 600
+        if (this.framesCounter % 500 === 0) {
             this.platforms.push(new Platforms(this.ctx, this.canvasSize.h, this.canvasSize.w, widthPlatformRandom, this.speed))
         }
     },
 
     generatePoints() {
-        const gelRandom = Math.floor(Math.random() * 50) + 150
+        const gelRandom = Math.floor(Math.random() * 100) + 300
         const maskRandom = Math.floor(Math.random() * 100) + 100
         if (this.framesCounter % gelRandom === 0) {
             this.gels.push(new Points(this.ctx, this.canvasSize.h, this.canvasSize.w, "./img/gel.png", this.speed, this.canvasSize.h - 70))
@@ -170,20 +174,14 @@ const Game = {
         this.sickPeople = this.sickPeople.filter(sickPerson => sickPerson.sickPersonPosition.x >= 0)
         this.masks = this.masks.filter(point => point.pointsPosition.x >= 0)
         this.gels = this.gels.filter(point => point.pointsPosition.x >= 0)
-        this.platforms = this.platforms.filter(platform => platform.platPos.x >= -1000)
+        this.platforms = this.platforms.filter(platform => platform.platPos.x >= -2000)
     },
 
-    cantGetPlatform() {
-        // this.platforms.forEach(elm => {
-        //     if (this.player.playerPositionY < elm.platPos.y + elm.platSize.h
-        //         && elm.platPos.x < this.player.playerPositionX 
-        //         && elm.platPos.x + elm.platSize.w > this.player.playerPositionX
-        //         && this.player.playerPositionY + this.player.playerHeight > elm.platPos.y + elm.platSize.h
-        //         ) {
-        //             // this.player.playerPositionY = this.player.floorLevel 
-        //             console.log("no puede subir")
-        //     }
-        // })
+    erase() {
+        this.sickPeople = this.sickPeople.filter(sickPerson => sickPerson.sickPersonPosition.x <= 0)
+        this.masks = this.masks.filter(point => point.pointsPosition.x <= 0)
+        this.gels = this.gels.filter(point => point.pointsPosition.x <= 0)
+        this.platforms = this.platforms.filter(platform => platform.platPos.x <= -2000)
     },
 
     isOnPlatform() {
@@ -193,15 +191,22 @@ const Game = {
                 && elm.platPos.x < this.player.playerPositionX
                 && elm.platPos.x + elm.platSize.w > this.player.playerPositionX
             ) {
-                this.player.floorLevel = elm.platPos.y - this.player.playerHeight - 20
-                this.player.playerPositionY = this.player.floorLevel
+                this.player.floorLevel = elm.platPos.y  
+                this.player.playerPositionY = this.player.floorLevel - this.player.playerHeight - 20
                 this.player.imageInstance.src = "./img/player-walking.png"
                 this.player.playerHeight = 250
             } else {
-                this.player.floorLevel = this.canvasSize.h - this.player.playerHeight - 20
+                this.player.floorLevel = this.canvasSize.h - 20
             }
-
         })
+    },
+
+    almostDead() {
+        if (this.totalPoint < 20) {
+            this.player.almostDead = true
+        } else {
+            this.player.almostDead = false
+        }
     },
 
     getPoints() {
@@ -212,7 +217,6 @@ const Game = {
                 this.player.playerPositionY + this.player.playerHeight > elm.pointsPosition.y) {
                 this.masks.splice(elm, 1);
                 this.totalPoint += 5
-                console.log(this.totalPoint)
             }
         })
         this.gels.forEach(elm => {
@@ -222,7 +226,6 @@ const Game = {
                 this.player.playerPositionY + this.player.playerHeight > elm.pointsPosition.y) {
                 this.gels.splice(elm, 1);
                 this.totalPoint += 10
-                console.log(this.totalPoint)
             }
         })
     },
@@ -231,47 +234,51 @@ const Game = {
         this.sickPeople.forEach(element => {
             if (element.sickPersonPosition.x < this.player.playerPositionX + this.player.playerWidth && this.player.playerPositionY === this.canvasSize.h - this.player.playerHeight - 20) {
                 this.totalPoint -= 25
-                console.log(this.totalPoint)
             }
         });
     },
 
     isVaccinated() {
-
         this.sickPeople.forEach(element => {
             if (element.sickPersonPosition.x < this.vaccine.vaccineX + this.vaccine.vaccineLength && this.player.playerPositionY === this.canvasSize.h - this.player.playerHeight - 20) {
                 this.sickPeople.splice(element, 1);
+                this.vaccine.vaccineLength = 0
+                this.vaccine.vaccineX = 175
             }
         });
-
     },
 
     gameOver() {
         if (this.totalPoint <= 0) {
-            this.audio.pause()
             clearInterval(this.interval)
+            this.audio.pause()
+            this.erase()
+            this.level = 1
+            this.speed = 5
             document.getElementById("gameover-screen").style.display = "block"
-
-            this.button = document.querySelector('#tryagain-button')
-            console.log(this.button)
-
-            this.button.addEventListener('click', () => {
+            this.tryAgainButton = document.querySelector('#tryagain-button')
+            this.tryAgainButton.addEventListener('click', () => {
                 document.getElementById("gameover-screen").style.display = "none"
+                this.totalPoint = 100
                 this.reset()
             });
         }
-
     },
 
     gameWon() {
         if (this.player.playerPositionX + this.player.playerWidth > this.home.homePos.x + this.home.homeSize.w / 2) {
-            this.audio.pause()
             clearInterval(this.interval)
+            this.audio.pause()
+            this.erase()
+            this.level += 1
+            this.speed += 1.5
             document.getElementById("gamewon-screen").style.display = "block"
-
-            this.button = document.querySelector('#playagain-button')
-
-            this.button.addEventListener('click', () => {
+            this.levelbtn = document.querySelector('#playagain-button span')
+            this.levelbtn.innerText = this.level
+            this.playAgainButton = document.querySelector('#playagain-button')
+            this.pointsCounter = document.querySelector('.final-points span')
+            this.pointsCounter.innerText = this.totalPoint
+            this.playAgainButton.addEventListener('click', () => {
                 document.getElementById("gamewon-screen").style.display = "none"
                 this.reset()
             });

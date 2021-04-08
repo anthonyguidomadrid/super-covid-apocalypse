@@ -13,7 +13,6 @@ class Platforms {
     }
 
     draw() {
-
         this.ctx.shadowColor = 'white'
         this.ctx.shadowBlur = 15
         this.ctx.fillStyle = '#98C8EF'

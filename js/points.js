@@ -1,7 +1,6 @@
 class Points {
 
     constructor(ctx, gameHeight, gameWidth, imageSource, speed, pointsPositionY) {
-
         this.ctx = ctx
         this.gameHeight = gameHeight
         this.gameWidth = gameWidth

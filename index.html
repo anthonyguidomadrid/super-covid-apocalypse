@@ -10,6 +10,9 @@
 </head>
 
 <body>
+    <audio autoplay loop>
+        <source src='./audio/music.mp3' />
+    </audio>
     <div id="health" class="health"><img src="./img/health.png" alt="Health Icon"> Total points: <span>0</span></div>
     <div id="start-screen" class="screen">
         <div class="background-picture start-bg">
@@ -23,7 +26,10 @@
     </div>
     <div id="gamewon-screen" class="screen">
         <div class="background-picture gamewon">
-            <div id="playagain-button" class="button tryagain">Play again</div>
+            <div id="playagain-button" class="button tryagain">Go to level <span>0</span></div>
+            <div class="final-points">
+                <img src="./img/health.png" alt="Health Icon"> Total points: <span>0</span>
+            </div>
         </div>
     </div>
     <canvas id="canvas"></canvas>
