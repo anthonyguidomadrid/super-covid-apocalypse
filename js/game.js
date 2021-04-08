@@ -121,6 +121,7 @@ const Game = {
 
     definemusic() {
         this.audio = document.querySelector("audio")
+        this.audio.volume = 0.1
     },
 
     pointsCounting() {
