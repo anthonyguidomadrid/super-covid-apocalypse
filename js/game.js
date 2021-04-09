@@ -175,14 +175,14 @@ const Game = {
         this.sickPeople = this.sickPeople.filter(sickPerson => sickPerson.sickPersonPosition.x >= 0)
         this.masks = this.masks.filter(point => point.pointsPosition.x >= 0)
         this.gels = this.gels.filter(point => point.pointsPosition.x >= 0)
-        this.platforms = this.platforms.filter(platform => platform.platPos.x >= -2000)
+        this.platforms = this.platforms.filter(platform => platform.platPos.x >= -1000)
     },
 
     erase() {
         this.sickPeople = this.sickPeople.filter(sickPerson => sickPerson.sickPersonPosition.x <= 0)
         this.masks = this.masks.filter(point => point.pointsPosition.x <= 0)
         this.gels = this.gels.filter(point => point.pointsPosition.x <= 0)
-        this.platforms = this.platforms.filter(platform => platform.platPos.x <= -2000)
+        this.platforms = this.platforms.filter(platform => platform.platPos.x <= -1000)
     },
 
     isOnPlatform() {
@@ -272,7 +272,7 @@ const Game = {
             this.audio.pause()
             this.erase()
             this.level += 1
-            this.speed += 1.5
+            this.speed += 1
             document.getElementById("gamewon-screen").style.display = "block"
             this.levelbtn = document.querySelector('#playagain-button span')
             this.levelbtn.innerText = this.level
